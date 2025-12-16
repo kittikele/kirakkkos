@@ -39,6 +39,8 @@
         </Menu>
 
         <Button Grid.Column="7" Content="Képválasztó" Click="KepValaszto_Click"/>
-        <Image Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="kepHelye" Stretch="Fill" Opacity="0.2"/>
+
+        <Image Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="kepHelye" Stretch="Fill" Opacity="0.25" Panel.ZIndex="0"/>
+        <Canvas Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="PuzzleCanvas" Background="Transparent" Panel.ZIndex="1"/>
     </Grid>
 </Window>

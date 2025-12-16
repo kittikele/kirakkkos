@@ -19,8 +19,14 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
+        const int MERET = 3;
+        BitmapImage eredetiKep;
+
+        UIElement huzottElem;
+        Point egérEltolás;
         public MainWindow()
         {
+
             InitializeComponent();
         }
 
@@ -47,20 +53,132 @@ namespace WpfApp1
         {
             OpenFileDialog ofd = new OpenFileDialog
             {
-                Title = "Kép kiválasztása",
-                Filter = "Képfájlok|*.jpg;*.jpeg;*.png;*.bmp;*.gif"
+                Filter = "Képfájlok|*.jpg;*.png;*.bmp"
             };
 
             if (ofd.ShowDialog() == true)
             {
-                BitmapImage bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(ofd.FileName);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-
-                kepHelye.Source = bitmap; //ez a kép
+                eredetiKep = new BitmapImage(new Uri(ofd.FileName));
+                kepHelye.Source = eredetiKep;   // halvány jó kép
+                KirakoLetrehoz();
             }
+        }
+        private void KirakoLetrehoz()
+        {
+            PuzzleCanvas.Children.Clear();
+
+            int canvasW = (int)PuzzleCanvas.ActualWidth;
+            int canvasH = (int)PuzzleCanvas.ActualHeight;
+
+            BitmapSource fillKep = KepFillMeretre(eredetiKep, canvasW, canvasH);
+
+            int darabW = canvasW / MERET;
+            int darabH = canvasH / MERET;
+
+            Random rnd = new Random();
+
+            for (int sor = 0; sor < MERET; sor++)
+            {
+                for (int oszlop = 0; oszlop < MERET; oszlop++)
+                {
+                    CroppedBitmap darab = new CroppedBitmap(
+                        fillKep,
+                        new Int32Rect(oszlop * darabW, sor * darabH, darabW, darabH));
+
+                    Image img = new Image
+                    {
+                        Source = darab,
+                        Width = darabW,
+                        Height = darabH,
+                        Stretch = Stretch.Fill,
+
+                        // HELYES POZÍCIÓ
+                        Tag = new Point(oszlop * darabW, sor * darabH)
+                    };
+
+                    Canvas.SetLeft(img, rnd.Next(0, canvasW - darabW));
+                    Canvas.SetTop(img, rnd.Next(0, canvasH - darabH));
+
+                    img.MouseLeftButtonDown += Darab_MouseDown;
+                    img.MouseMove += Darab_MouseMove;
+                    img.MouseLeftButtonUp += Darab_MouseUp;
+
+                    PuzzleCanvas.Children.Add(img);
+                }
+            }
+        }
+        private void Darab_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            huzottElem = sender as UIElement;
+
+            // FONTOS: az egér pozíciója A DARABON BELÜL
+            egérEltolás = e.GetPosition(huzottElem);
+
+            Panel.SetZIndex(huzottElem, 10);
+            huzottElem.CaptureMouse();
+            Panel.SetZIndex(huzottElem, 1);
+        }
+        private void Darab_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (huzottElem == null) return;
+
+            Point p = e.GetPosition(PuzzleCanvas);
+
+            Canvas.SetLeft(huzottElem, p.X - egérEltolás.X);
+            Canvas.SetTop(huzottElem, p.Y - egérEltolás.Y);
+            Panel.SetZIndex(huzottElem, 10);
+        }
+        private void Darab_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (huzottElem == null) return;
+
+            huzottElem.ReleaseMouseCapture();
+
+            // vissza alap szintre
+            Panel.SetZIndex(huzottElem, 1);
+
+            Image img = huzottElem as Image;
+            Point helyes = (Point)img.Tag;
+
+            double x = Canvas.GetLeft(img);
+            double y = Canvas.GetTop(img);
+
+            if (Math.Abs(x - helyes.X) < 20 && Math.Abs(y - helyes.Y) < 20)
+            {
+                Canvas.SetLeft(img, helyes.X);
+                Canvas.SetTop(img, helyes.Y);
+            }
+
+            huzottElem = null;
+            Ellenorzes();
+        }
+        private void Ellenorzes()
+        {
+            foreach (UIElement elem in PuzzleCanvas.Children)
+            {
+                Image img = elem as Image;
+                Point helyes = (Point)img.Tag;
+
+                if (Math.Abs(Canvas.GetLeft(img) - helyes.X) > 1 ||
+                    Math.Abs(Canvas.GetTop(img) - helyes.Y) > 1)
+                    return;
+            }
+
+            MessageBox.Show("Ügyes volt! 🎉");
+        }
+        private RenderTargetBitmap KepFillMeretre(BitmapSource forras, int w, int h)
+        {
+            DrawingVisual dv = new DrawingVisual();
+            using (DrawingContext dc = dv.RenderOpen())
+            {
+                dc.DrawImage(forras, new Rect(0, 0, w, h));
+            }
+
+            RenderTargetBitmap rtb =
+                new RenderTargetBitmap(w, h, 96, 96, PixelFormats.Pbgra32);
+
+            rtb.Render(dv);
+            return rtb;
         }
     }
 }
