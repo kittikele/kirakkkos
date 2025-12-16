@@ -59,7 +59,7 @@ namespace WpfApp1
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.EndInit();
 
-                kepHelye.Source = bitmap;
+                kepHelye.Source = bitmap; //ez a kép
             }
         }
     }
