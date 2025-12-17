@@ -24,6 +24,8 @@ namespace WpfApp1
 
         UIElement huzottElem;
         Point egérEltolás;
+
+        TextBox[,] sudokuMezok = new TextBox[9, 9];
         public MainWindow()
         {
 
@@ -172,6 +174,24 @@ namespace WpfApp1
 
             MessageBox.Show("Ügyes volt! 🎉");
         }
+        private void Tema_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = sender as MenuItem;
+            if (menu == null) return;
+
+            switch (menu.Header.ToString())
+            {
+                case "Gyümölcs":
+                    valasztott.Header = "Gyümölcs";
+                    break;
+                case "Zöldség":
+                    valasztott.Header = "Zöldség";
+                    break;
+                case "Ország":
+                    valasztott.Header = "Ország";
+                    break;
+            }
+        }
         private RenderTargetBitmap KepFillMeretre(BitmapSource forras, int w, int h)
         {
             DrawingVisual dv = new DrawingVisual();
@@ -185,6 +205,78 @@ namespace WpfApp1
 
             rtb.Render(dv);
             return rtb;
+        }
+        private void KirakoMenu_Click(object sender, RoutedEventArgs e)
+        {
+            SudokuGrid.Visibility = Visibility.Collapsed;
+            PuzzleCanvas.Visibility = Visibility.Visible;
+            kepHelye.Visibility = Visibility.Visible;
+        }
+
+        private void SudokuMenu_Click(object sender, RoutedEventArgs e)
+        {
+            PuzzleCanvas.Visibility = Visibility.Collapsed;
+            kepHelye.Visibility = Visibility.Collapsed;
+            SudokuGrid.Visibility = Visibility.Visible;
+
+            SudokuLetrehoz();
+        }
+        private void SudokuLetrehoz()
+        {
+            SudokuGrid.Children.Clear();
+            SudokuGrid.RowDefinitions.Clear();
+            SudokuGrid.ColumnDefinitions.Clear();
+
+            for (int i = 0; i < 9; i++)
+            {
+                SudokuGrid.RowDefinitions.Add(new RowDefinition());
+                SudokuGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+
+            int[,] minta =
+            {
+        {5,3,0, 0,7,0, 0,0,0},
+        {6,0,0, 1,9,5, 0,0,0},
+        {0,9,8, 0,0,0, 0,6,0},
+
+        {8,0,0, 0,6,0, 0,0,3},
+        {4,0,0, 8,0,3, 0,0,1},
+        {7,0,0, 0,2,0, 0,0,6},
+
+        {0,6,0, 0,0,0, 2,8,0},
+        {0,0,0, 4,1,9, 0,0,5},
+        {0,0,0, 0,8,0, 0,7,9}
+    };
+
+            for (int r = 0; r < 9; r++)
+            {
+                for (int c = 0; c < 9; c++)
+                {
+                    TextBox tb = new TextBox
+                    {
+                        FontSize = 20,
+                        TextAlignment = TextAlignment.Center,
+                        VerticalContentAlignment = VerticalAlignment.Center,
+                        BorderThickness = new Thickness(
+                            c % 3 == 0 ? 2 : 1,
+                            r % 3 == 0 ? 2 : 1,
+                            1, 1)
+                    };
+
+                    if (minta[r, c] != 0)
+                    {
+                        tb.Text = minta[r, c].ToString();
+                        tb.IsReadOnly = true;
+                        tb.Background = Brushes.LightGray;
+                    }
+
+                    Grid.SetRow(tb, r);
+                    Grid.SetColumn(tb, c);
+
+                    sudokuMezok[r, c] = tb;
+                    SudokuGrid.Children.Add(tb);
+                }
+            }
         }
     }
 }

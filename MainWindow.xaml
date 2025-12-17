@@ -30,17 +30,29 @@
         </Grid.RowDefinitions>
 
         <!-- MENÜSOR -->
+        <Menu Grid.Column="2">
+            <MenuItem Header="Játék">
+                <MenuItem Header="Kirakó" Click="KirakoMenu_Click"/>
+                <MenuItem Header="Sudoku" Click="SudokuMenu_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="valasztott" FontSize="14"/>
+        </Menu>
         <Menu Grid.Column="1">
+
             <MenuItem Header="Hol" FontSize="14">
                 <MenuItem Header="Helyszín" Click="Menu_Click"/>
                 <MenuItem Header="Mikor" Click="Menu_Click"/>
             </MenuItem>
+                
             <MenuItem Header="Kik" FontSize="14" Click="Menu_Click"/>
+                
         </Menu>
 
         <Button Grid.Column="7" Content="Képválasztó" Click="KepValaszto_Click"/>
 
         <Image Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="kepHelye" Stretch="Fill" Opacity="0.25" Panel.ZIndex="0"/>
         <Canvas Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="PuzzleCanvas" Background="Transparent" Panel.ZIndex="1"/>
+        
+        <Grid x:Name="SudokuGrid" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Visibility="Collapsed"/>
     </Grid>
 </Window>
