@@ -221,6 +221,18 @@ namespace WpfApp1
 
             SudokuLetrehoz();
         }
+        int[,] teljesSudoku =
+{
+    {5,3,4,6,7,8,9,1,2},
+    {6,7,2,1,9,5,3,4,8},
+    {1,9,8,3,4,2,5,6,7},
+    {8,5,9,7,6,1,4,2,3},
+    {4,2,6,8,5,3,7,9,1},
+    {7,1,3,9,2,4,8,5,6},
+    {9,6,1,5,3,7,2,8,4},
+    {2,8,7,4,1,9,6,3,5},
+    {3,4,5,2,8,6,1,7,9}
+};
         private void SudokuLetrehoz()
         {
             SudokuGrid.Children.Clear();
@@ -233,20 +245,8 @@ namespace WpfApp1
                 SudokuGrid.ColumnDefinitions.Add(new ColumnDefinition());
             }
 
-            int[,] minta =
-            {
-        {5,3,0, 0,7,0, 0,0,0},
-        {6,0,0, 1,9,5, 0,0,0},
-        {0,9,8, 0,0,0, 0,6,0},
-
-        {8,0,0, 0,6,0, 0,0,3},
-        {4,0,0, 8,0,3, 0,0,1},
-        {7,0,0, 0,2,0, 0,0,6},
-
-        {0,6,0, 0,0,0, 2,8,0},
-        {0,0,0, 4,1,9, 0,0,5},
-        {0,0,0, 0,8,0, 0,7,9}
-    };
+            int[,] kevert = SudokuKever(teljesSudoku);
+            int[,] feladvany = FeladvanyKeszit(kevert, 45); // közepes
 
             for (int r = 0; r < 9; r++)
             {
@@ -263,19 +263,75 @@ namespace WpfApp1
                             1, 1)
                     };
 
-                    if (minta[r, c] != 0)
+                    if (feladvany[r, c] != 0)
                     {
-                        tb.Text = minta[r, c].ToString();
+                        tb.Text = feladvany[r, c].ToString();
                         tb.IsReadOnly = true;
                         tb.Background = Brushes.LightGray;
                     }
 
                     Grid.SetRow(tb, r);
                     Grid.SetColumn(tb, c);
-
-                    sudokuMezok[r, c] = tb;
                     SudokuGrid.Children.Add(tb);
                 }
+            }
+        }
+        private int[,] FeladvanyKeszit(int[,] megoldas, int uresMezok)
+        {
+            int[,] tabla = (int[,])megoldas.Clone();
+
+            int torolt = 0;
+            while (torolt < uresMezok)
+            {
+                int r = rnd.Next(9);
+                int c = rnd.Next(9);
+
+                if (tabla[r, c] != 0)
+                {
+                    tabla[r, c] = 0;
+                    torolt++;
+                }
+            }
+            return tabla;
+        }
+        Random rnd = new Random();
+
+        private int[,] SudokuKever(int[,] tabla)
+        {
+            int[,] uj = (int[,])tabla.Clone();
+
+            // sorcsoportok keverése
+            for (int i = 0; i < 9; i += 3)
+                KeverSorok(uj, i);
+
+            // oszlopcsoportok keverése
+            for (int i = 0; i < 9; i += 3)
+                KeverOszlopok(uj, i);
+
+            return uj;
+        }
+
+        private void KeverSorok(int[,] t, int start)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                int r1 = start + i;
+                int r2 = start + rnd.Next(3);
+
+                for (int c = 0; c < 9; c++)
+                    (t[r1, c], t[r2, c]) = (t[r2, c], t[r1, c]);
+            }
+        }
+
+        private void KeverOszlopok(int[,] t, int start)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                int c1 = start + i;
+                int c2 = start + rnd.Next(3);
+
+                for (int r = 0; r < 9; r++)
+                    (t[r, c1], t[r, c2]) = (t[r, c2], t[r, c1]);
             }
         }
     }
