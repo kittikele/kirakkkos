@@ -31,12 +31,17 @@
 
         <!-- MENÜSOR -->
         <Menu Grid.Column="2">
-            <MenuItem Header="Játék">
+            <MenuItem Header="Játék" FontSize="14">
                 <MenuItem Header="Kirakó" Click="KirakoMenu_Click"/>
                 <MenuItem Header="Sudoku" Click="SudokuMenu_Click"/>
             </MenuItem>
-            <MenuItem x:Name="valasztott" FontSize="14"/>
+            
+            <MenuItem x:Name="ValasztottMenu" Header="Választott: -" IsEnabled="False"/>
         </Menu>
+        <Menu Grid.Column="3">
+            <MenuItem x:Name="KepValasztoMenu" Header="Képválasztó" Click="KepValaszto_Click" Visibility="Collapsed"/>
+        </Menu>
+        
         <Menu Grid.Column="1">
 
             <MenuItem Header="Hol" FontSize="14">
@@ -48,7 +53,6 @@
                 
         </Menu>
 
-        <Button Grid.Column="7" Content="Képválasztó" Click="KepValaszto_Click"/>
 
         <Image Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="kepHelye" Stretch="Fill" Opacity="0.25" Panel.ZIndex="0"/>
         <Canvas Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="PuzzleCanvas" Background="Transparent" Panel.ZIndex="1"/>

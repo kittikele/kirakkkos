@@ -174,24 +174,6 @@ namespace WpfApp1
 
             MessageBox.Show("Ügyes volt! 🎉");
         }
-        private void Tema_Click(object sender, RoutedEventArgs e)
-        {
-            var menu = sender as MenuItem;
-            if (menu == null) return;
-
-            switch (menu.Header.ToString())
-            {
-                case "Gyümölcs":
-                    valasztott.Header = "Gyümölcs";
-                    break;
-                case "Zöldség":
-                    valasztott.Header = "Zöldség";
-                    break;
-                case "Ország":
-                    valasztott.Header = "Ország";
-                    break;
-            }
-        }
         private RenderTargetBitmap KepFillMeretre(BitmapSource forras, int w, int h)
         {
             DrawingVisual dv = new DrawingVisual();
@@ -211,6 +193,9 @@ namespace WpfApp1
             SudokuGrid.Visibility = Visibility.Collapsed;
             PuzzleCanvas.Visibility = Visibility.Visible;
             kepHelye.Visibility = Visibility.Visible;
+
+            KepValasztoMenu.Visibility = Visibility.Visible;
+            ValasztottMenu.Header = "Választott: Kirakó";
         }
 
         private void SudokuMenu_Click(object sender, RoutedEventArgs e)
@@ -220,19 +205,21 @@ namespace WpfApp1
             SudokuGrid.Visibility = Visibility.Visible;
 
             SudokuLetrehoz();
+            KepValasztoMenu.Visibility = Visibility.Collapsed;
+            ValasztottMenu.Header = "Választott: Sudoku";
         }
         int[,] teljesSudoku =
-{
-    {5,3,4,6,7,8,9,1,2},
-    {6,7,2,1,9,5,3,4,8},
-    {1,9,8,3,4,2,5,6,7},
-    {8,5,9,7,6,1,4,2,3},
-    {4,2,6,8,5,3,7,9,1},
-    {7,1,3,9,2,4,8,5,6},
-    {9,6,1,5,3,7,2,8,4},
-    {2,8,7,4,1,9,6,3,5},
-    {3,4,5,2,8,6,1,7,9}
-};
+        {
+            {5,3,4,6,7,8,9,1,2},
+            {6,7,2,1,9,5,3,4,8},
+            {1,9,8,3,4,2,5,6,7},
+            {8,5,9,7,6,1,4,2,3},
+            {4,2,6,8,5,3,7,9,1},
+            {7,1,3,9,2,4,8,5,6},
+            {9,6,1,5,3,7,2,8,4},
+            {2,8,7,4,1,9,6,3,5},
+            {3,4,5,2,8,6,1,7,9}
+        };
         private void SudokuLetrehoz()
         {
             SudokuGrid.Children.Clear();
