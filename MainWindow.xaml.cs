@@ -104,6 +104,7 @@ namespace WpfApp1
                     img.MouseLeftButtonUp += Darab_MouseUp;
 
                     PuzzleCanvas.Children.Add(img);
+                    Panel.SetZIndex(img, 1); // alapból a canvas tetején 
                 }
             }
         }
@@ -116,7 +117,6 @@ namespace WpfApp1
 
             Panel.SetZIndex(huzottElem, 10);
             huzottElem.CaptureMouse();
-            Panel.SetZIndex(huzottElem, 1);
         }
         private void Darab_MouseMove(object sender, MouseEventArgs e)
         {
@@ -126,7 +126,6 @@ namespace WpfApp1
 
             Canvas.SetLeft(huzottElem, p.X - egérEltolás.X);
             Canvas.SetTop(huzottElem, p.Y - egérEltolás.Y);
-            Panel.SetZIndex(huzottElem, 10);
         }
         private void Darab_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -147,6 +146,13 @@ namespace WpfApp1
             {
                 Canvas.SetLeft(img, helyes.X);
                 Canvas.SetTop(img, helyes.Y);
+
+                Panel.SetZIndex(img, -1);        // CANVAS ALJÁRA
+                img.IsHitTestVisible = false;    // ne legyen mozgatható
+            }
+            else
+            {
+                Panel.SetZIndex(img, 1); // marad a többi felett
             }
 
             huzottElem = null;
