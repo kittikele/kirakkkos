@@ -6,9 +6,26 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="SudokuTextBoxStyle" TargetType="TextBox">
+            <!-- alap kinézet -->
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Background" Value="White"/>
+
+            <Style.Triggers>
+                <!-- hover nem változtat semmit -->
+                <Trigger Property="IsMouseOver" Value="True"/>
+                <!-- fókusz sem változtat -->
+                <Trigger Property="IsKeyboardFocused" Value="True"/>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid x:Name="MainGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="20"/>
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
@@ -16,21 +33,22 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="45"/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
         <!-- MENÜSOR -->
-        <Menu Grid.Column="2">
+        <Menu Grid.Column="2" Grid.Row="1">
             <MenuItem Header="Játék" FontSize="14">
                 <MenuItem Header="Kirakó" Click="KirakoMenu_Click"/>
                 <MenuItem Header="Sudoku" Click="SudokuMenu_Click"/>
@@ -38,11 +56,12 @@
             
             <MenuItem x:Name="ValasztottMenu" Header="Választott: -" IsEnabled="False"/>
         </Menu>
-        <Menu Grid.Column="3">
+        <Menu Grid.Column="3" Grid.Row="1">
             <MenuItem x:Name="KepValasztoMenu" Header="Képválasztó" Click="KepValaszto_Click" Visibility="Collapsed"/>
+            <MenuItem x:Name="SudokuEllenorzesMenu" Header="Ellenőrzés" Click="SudokuEllenorzesBtn_Click" Visibility="Collapsed"/>
         </Menu>
-        
-        <Menu Grid.Column="1">
+
+        <Menu Grid.Column="1" Grid.Row="1">
 
             <MenuItem Header="Hol" FontSize="14">
                 <MenuItem Header="Helyszín" Click="Menu_Click"/>
@@ -54,9 +73,9 @@
         </Menu>
 
 
-        <Image Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="kepHelye" Stretch="Fill" Opacity="0.25" Panel.ZIndex="0"/>
-        <Canvas Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="PuzzleCanvas" Background="Transparent" Panel.ZIndex="1"/>
+        <Image Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="kepHelye" Stretch="Fill" Opacity="0.25" Panel.ZIndex="0"/>
+        <Canvas Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="6" Name="PuzzleCanvas" Background="Transparent" Panel.ZIndex="1"/>
         
-        <Grid x:Name="SudokuGrid" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="6" Visibility="Collapsed"/>
+        <Grid x:Name="SudokuGrid" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="6" Visibility="Collapsed"/>
     </Grid>
 </Window>

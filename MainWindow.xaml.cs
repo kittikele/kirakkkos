@@ -25,6 +25,8 @@ namespace WpfApp1
         UIElement huzottElem;
         Point egérEltolás;
 
+        int[,] aktualisMegoldas;
+        
         TextBox[,] sudokuMezok = new TextBox[9, 9];
         public MainWindow()
         {
@@ -195,9 +197,10 @@ namespace WpfApp1
             kepHelye.Visibility = Visibility.Visible;
 
             KepValasztoMenu.Visibility = Visibility.Visible;
+            SudokuEllenorzesMenu.Visibility = Visibility.Collapsed;
             ValasztottMenu.Header = "Választott: Kirakó";
         }
-
+        // -- -- -- -- --
         private void SudokuMenu_Click(object sender, RoutedEventArgs e)
         {
             PuzzleCanvas.Visibility = Visibility.Collapsed;
@@ -206,6 +209,7 @@ namespace WpfApp1
 
             SudokuLetrehoz();
             KepValasztoMenu.Visibility = Visibility.Collapsed;
+            SudokuEllenorzesMenu.Visibility = Visibility.Visible;
             ValasztottMenu.Header = "Választott: Sudoku";
         }
         int[,] teljesSudoku =
@@ -233,6 +237,7 @@ namespace WpfApp1
             }
 
             int[,] kevert = SudokuKever(teljesSudoku);
+            aktualisMegoldas = kevert;
             int[,] feladvany = FeladvanyKeszit(kevert, 45); // közepes
 
             for (int r = 0; r < 9; r++)
@@ -244,11 +249,19 @@ namespace WpfApp1
                         FontSize = 20,
                         TextAlignment = TextAlignment.Center,
                         VerticalContentAlignment = VerticalAlignment.Center,
+                        Style = (Style)FindResource("SudokuTextBoxStyle"),
                         BorderThickness = new Thickness(
                             c % 3 == 0 ? 2 : 1,
                             r % 3 == 0 ? 2 : 1,
                             1, 1)
                     };
+
+                    // tárolás ellenőrzéshez
+                    sudokuMezok[r, c] = tb;
+
+                    // 1–9 gépelés és beillesztés kezelése
+                    tb.PreviewTextInput += Sudoku_PreviewTextInput;
+                    DataObject.AddPastingHandler(tb, Sudoku_Paste);
 
                     if (feladvany[r, c] != 0)
                     {
@@ -263,6 +276,38 @@ namespace WpfApp1
                 }
             }
         }
+        private void Sudoku_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (e.Text.Length != 1 || e.Text[0] < '1' || e.Text[0] > '9')
+            {
+                e.Handled = true;
+                return;
+            }
+
+            TextBox tb = sender as TextBox;
+            tb.Text = e.Text;
+            tb.CaretIndex = 1;
+            e.Handled = true;
+        }
+
+        private void Sudoku_Paste(object sender, DataObjectPastingEventArgs e)
+        {
+            if (!e.SourceDataObject.GetDataPresent(DataFormats.Text)) { e.CancelCommand(); return; }
+
+            string text = e.SourceDataObject.GetData(DataFormats.Text) as string;
+
+            if (string.IsNullOrWhiteSpace(text) || text.Length != 1 || text[0] < '1' || text[0] > '9')
+            {
+                e.CancelCommand();
+                return;
+            }
+
+            TextBox tb = sender as TextBox;
+            tb.Text = text;
+            tb.CaretIndex = 1;
+            e.CancelCommand();
+        }
+
         private int[,] FeladvanyKeszit(int[,] megoldas, int uresMezok)
         {
             int[,] tabla = (int[,])megoldas.Clone();
@@ -319,6 +364,67 @@ namespace WpfApp1
 
                 for (int r = 0; r < 9; r++)
                     (t[r, c1], t[r, c2]) = (t[r, c2], t[r, c1]);
+            }
+        }
+        private void SudokuEllenorzesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            bool mindenJo = true;
+
+            // HALVÁNY SZÍNEK DEFINÍCIÓJA
+            Brush joBorder = Brushes.RoyalBlue;
+            Brush joHatter = new SolidColorBrush(Color.FromArgb(20, 65, 105, 225)); // nagyon halvány kék
+
+            Brush rosszBorder = Brushes.OrangeRed;
+            Brush rosszHatter = new SolidColorBrush(Color.FromArgb(20, 255, 69, 0));  // nagyon halvány piros
+
+            for (int r = 0; r < 9; r++)
+            {
+                for (int c = 0; c < 9; c++)
+                {
+                    TextBox tb = sudokuMezok[r, c];
+
+                    // SZÜRKE, ELŐRE MEGADOTT MEZŐK KIHAGYÁSA
+                    if (tb.IsReadOnly)
+                        continue;
+
+                    // ÜRES MEZŐK KIHAGYÁSA
+                    if (string.IsNullOrWhiteSpace(tb.Text))
+                    {
+                        mindenJo = false;   // még nincs kész
+                        continue;
+                    }
+
+                    // NEM SZÁM / HIBÁS
+                    if (!int.TryParse(tb.Text, out int ertek) || ertek < 1 || ertek > 9)
+                    {
+                        tb.BorderBrush = rosszBorder;
+                        tb.Background = rosszHatter;
+                        tb.BorderThickness = new Thickness(1.5);
+                        mindenJo = false;
+                        continue;
+                    }
+
+                    // HELYES / HELYTELEN
+                    tb.BorderThickness = new Thickness(1.5);
+
+                    if (ertek == aktualisMegoldas[r, c])
+                    {
+                        tb.BorderBrush = joBorder;       // jó mező kerete
+                        tb.Background = joHatter;        // halvány kék háttér
+                    }
+                    else
+                    {
+                        tb.BorderBrush = rosszBorder;    // rossz mező kerete
+                        tb.Background = rosszHatter;     // halvány piros háttér
+                        mindenJo = false;
+                    }
+                }
+            }
+
+            // HA MIND JÓ, ÜZENET
+            if (mindenJo)
+            {
+                MessageBox.Show("Ügyes volt! 🎉");
             }
         }
     }
